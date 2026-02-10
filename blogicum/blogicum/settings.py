@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-oyn9ryn8c3df3#uy9ybmcc02ii%l#59e06qe%!huri_!#i#287
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
@@ -39,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core.apps.CoreConfig',
+    'users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +138,7 @@ STATICFILES_DIRS = [
 ]
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
+
+LOGIN_REDIRECT_URL = 'blog:index'
+
+LOGIN_URL = 'login'

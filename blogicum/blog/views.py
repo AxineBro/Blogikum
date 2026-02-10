@@ -1,6 +1,12 @@
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse_lazy
 from .models import Post, Category
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserChangeForm
+from django.views.generic import UpdateView
+
+User = get_user_model()
 
 
 def get_published_posts():
@@ -57,3 +63,13 @@ def category_posts(request, category_slug):
     }
 
     return render(request, 'blog/category.html', context)
+
+
+class ProfileUpdateView(UpdateView):
+    model = User
+    form_class = UserChangeForm
+    template_name = 'blog/user.html'
+    success_url = reverse_lazy('blog:index')
+
+    def get_object(self):
+        return self.request.user
