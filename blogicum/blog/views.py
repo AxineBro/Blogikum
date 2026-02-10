@@ -3,8 +3,9 @@ from django.urls import reverse_lazy
 from .models import Post, Category
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserChangeForm
 from django.views.generic import UpdateView
+from .forms import ProfileEditForm
+from django.core.paginator import Paginator
 
 User = get_user_model()
 
@@ -24,10 +25,16 @@ def index(request):
         'author',
         'location',
         'category'
-    ).order_by('-pub_date')[:5]
+    ).order_by('-pub_date')
+
+    paginator = Paginator(posts, 10)
+
+    page_number = request.GET.get('page')
+
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'post_list': posts
+        'page_obj': page_obj
     }
     return render(request, template, context)
 
@@ -57,9 +64,15 @@ def category_posts(request, category_slug):
         pub_date__lte=timezone.now()
     ).select_related('author', 'location')
 
+    paginator = Paginator(posts, 10)
+
+    page_number = request.GET.get('page')
+
+    page_obj = paginator.get_page(page_number)
+
     context = {
         'category': category,
-        'post_list': posts
+        'page_obj': page_obj
     }
 
     return render(request, 'blog/category.html', context)
@@ -67,9 +80,9 @@ def category_posts(request, category_slug):
 
 class ProfileUpdateView(UpdateView):
     model = User
-    form_class = UserChangeForm
+    form_class = ProfileEditForm
     template_name = 'blog/user.html'
-    success_url = reverse_lazy('blog:index')
+    success_url = reverse_lazy('blog:user')
 
     def get_object(self):
         return self.request.user
