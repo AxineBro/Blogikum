@@ -85,6 +85,12 @@ class Post(Base):
         verbose_name='Категория',
         related_name='posts'
     )
+    image = models.ImageField(
+        'Изображение',
+        upload_to='posts_images/',
+        blank=True,
+        help_text='Загрузите изображение для поста'
+    )
 
     class Meta:
         verbose_name = 'публикация'

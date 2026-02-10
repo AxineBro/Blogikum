@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
     'users.apps.UsersConfig',
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -142,3 +143,5 @@ CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 LOGIN_REDIRECT_URL = 'blog:index'
 
 LOGIN_URL = 'login'
+
+MEDIA_ROOT = BASE_DIR / 'media'
