@@ -38,5 +38,4 @@ urlpatterns = [
         ),
         name='registration',
     ),
-    path('profile/', include('users.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

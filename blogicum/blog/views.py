@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from .models import Post, Category
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, DetailView
 from .forms import ProfileEditForm
 from django.core.paginator import Paginator
 
@@ -82,7 +82,28 @@ class ProfileUpdateView(UpdateView):
     model = User
     form_class = ProfileEditForm
     template_name = 'blog/user.html'
-    success_url = reverse_lazy('blog:user')
+
+    def get_success_url(self):
+        return reverse('blog:profile', args=[self.object.username])
 
     def get_object(self):
         return self.request.user
+
+
+class ProfileDetailView(DetailView):
+    model = User
+    template_name = 'blog/profile.html'
+    context_object_name = 'profile'
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user_posts = Post.objects.filter(author=self.object)
+        paginator = Paginator(user_posts, 10)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context['page_obj'] = page_obj
+        return context
