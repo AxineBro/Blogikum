@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from .models import Post, Category
 from django.utils import timezone
@@ -79,7 +79,7 @@ def category_posts(request, category_slug):
     return render(request, 'blog/category.html', context)
 
 
-class ProfileUpdateView(UpdateView):
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = ProfileEditForm
     template_name = 'blog/user.html'
@@ -131,6 +131,10 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author or self.request.user.is_staff
+
+    def handle_no_permission(self):
+        post = self.get_object()
+        return redirect('blog:post_detail', post_id=post.pk)
 
     def get_success_url(self):
         return reverse('blog:post_detail', args=[self.object.id])
