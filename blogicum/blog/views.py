@@ -3,8 +3,9 @@ from django.urls import reverse, reverse_lazy
 from .models import Post, Category
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from django.views.generic import UpdateView, DetailView
-from .forms import ProfileEditForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import UpdateView, DetailView, CreateView
+from .forms import ProfileEditForm, PostForm
 from django.core.paginator import Paginator
 
 User = get_user_model()
@@ -107,3 +108,16 @@ class ProfileDetailView(DetailView):
 
         context['page_obj'] = page_obj
         return context
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/create.html'
+
+    def get_success_url(self):
+        return reverse('blog:profile', args=[self.object.author.username])
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
