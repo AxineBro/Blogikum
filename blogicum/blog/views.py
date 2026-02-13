@@ -1,9 +1,12 @@
-from django.shortcuts import get_object_or_404, render, redirect
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import UpdateView, DetailView, CreateView, ListView, DeleteView
+from django.views.generic import (
+    UpdateView, DetailView, CreateView, ListView, DeleteView
+)
 from django.core.paginator import Paginator
 from django.utils import timezone
 from .models import Post, Category, Comment
@@ -33,9 +36,20 @@ class PostDetailView(DetailView):
     pk_url_kwarg = 'post_id'
 
     def get_queryset(self):
-        return get_published_posts().select_related(
+        return Post.objects.all().select_related(
             'author', 'location', 'category'
         )
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset=queryset)
+
+        if self.request.user == obj.author:
+            return obj
+        if not (obj.is_published
+                and obj.category.is_published
+                and obj.pub_date <= timezone.now()):
+            raise Http404
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

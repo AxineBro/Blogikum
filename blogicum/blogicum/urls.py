@@ -20,8 +20,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.conf.urls.static import static
 from django.conf import settings
 
-handler404 = 'core.views.page_not_found'
-handler500 = 'core.views.internal_server_error'
+handler404 = 'pages.views.page_not_found'
+handler500 = 'pages.views.internal_server_error'
 
 
 urlpatterns = [
